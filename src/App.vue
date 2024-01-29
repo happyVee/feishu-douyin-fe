@@ -1,10 +1,10 @@
 <script setup>
-import Form from './components/Form.vue'
+import Douyin from './components/Douyin.vue'
 </script>
 
 <template>
   <main>
-    <Form />
+    <Douyin />
   </main>
 </template>
 
