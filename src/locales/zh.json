@@ -3,15 +3,22 @@
   "selectGroup": {
     "selectAll": "全选",
     "videoInfo": {
+      "type": "类型",
       "title": "标题",
       "uploader": "博主",
       "releaseTime": "发布时间",
-      "lastUpdateTime": "最后更新时间",
       "collectionCount": "收藏量",
       "likeCount": "点赞量",
       "shareCount": "转发量",
       "commentCount": "评论量",
-      "totalInterCount": "总互动量",
+      "videoUrl": "视频地址",
+      "videoCover": "视频封面",
+      "musicUrl": "配乐地址",
+      "musicTitle": "配乐标题",
+      "signature": "博主签名",
+      "userhome": "用户主页",
+      "videoId": "视频id",
+      "images": "图片列表",
       "fetchDataTime": "数据获取时间"
     }
   },

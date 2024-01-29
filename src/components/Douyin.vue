@@ -80,6 +80,7 @@ const isDetailMode = ref(true)
 const checkAllToMap = ref(false)
 const isIndeterminateToMap = ref(true)
 const fieldsToMap = ref([
+  { "label": "type" },
   {
     "label": "title"
   },
@@ -89,12 +90,6 @@ const fieldsToMap = ref([
   {
     "label": "releaseTime"
   },
-  {
-    "label": "lastUpdateTime"
-  },
-  // {
-  //   "label": "viewCount"
-  // },
   {
     "label": "collectionCount"
   },
@@ -108,22 +103,50 @@ const fieldsToMap = ref([
     "label": "commentCount"
   },
   {
-    "label": "totalInterCount"
+    "label": "videoUrl"
+  },
+  {
+    "label": "videoCover"
+  },
+  {
+    "label": "musicUrl"
+  },
+  {
+    "label": "musicTitle"
+  },
+  {
+    "label": "signature"
+  },
+  {
+    "label": "userhome"
+  },
+  {
+    "label": "videoId"
+  },
+  {
+    "label": "images"
   },
   {
     "label": "fetchDataTime"
   }
 ])   //  可以创建的字段
 const checkedFieldsToMap = ref([
+  'type',
   'title',
   'uploader',
   'releaseTime',
-  'lastUpdateTime',
-  // 'viewCount',
   'collectionCount',
   'likeCount',
   'shareCount',
   'commentCount',
+  'videoUrl',
+  "videoCover",
+  "musicUrl",
+  "musicTitle",
+  "signature",
+  "userhome",
+  "videoId",
+  "images",
   'fetchDataTime'
 ])   // 默认的to-map的字段
 
@@ -296,11 +319,10 @@ const getSelectedFieldsId = (fieldList, checkedFields) => {
 */
 const getDouyinDataByUrl = async (path, noteLink) => {
   
-  var url = `https://defd8ee3-2f16-4b36-a0b8-80edfde44bed-00-c7yvtpu6hecd.sisko.replit.dev/${path}`
-  // var url = `https://b38518d2-23ba-4ef1-bb13-9d8618f01f35-00-271zcrskr9ata.worf.replit.dev/${path}`
+  // var url = `https://defd8ee3-2f16-4b36-a0b8-80edfde44bed-00-c7yvtpu6hecd.sisko.replit.dev/${path}`
+  var url = `http://localhost:4000/${path}`
   let res;
   let dyCookie = parseCookies(cookie.value);
-  console.log("dycookie===========>", dyCookie);
 
   var data = {
     'url': noteLink,
@@ -320,15 +342,23 @@ const getDouyinDataByUrl = async (path, noteLink) => {
       res = {
         "status": 200,
         "info": {
+          "type": douyinInfo.type,
           "title": douyinInfo.desc,
           "uploader": douyinInfo.nickname,
-          "releaseTime": douyinInfo.time,
-          "lastUpdateTime": douyinInfo.last_update_time,
+          "releaseTime": douyinInfo.createTime,
+          "videoUrl": douyinInfo.videoUrl,
+          "videoCover": douyinInfo.videoCover,
+          "musicUrl": douyinInfo.musicUrl,
+          "musicTitle": douyinInfo.musicTitle,
+          "signature": douyinInfo.signature,
+          "userhome": douyinInfo.userhome,
+          "uniqueId": douyinInfo.uniqueId,
+          "videoId": douyinInfo.videoId,
+          "images": douyinInfo.images,
           "collectionCount": Number(douyinInfo.statistics.collect_count) ,
           "likeCount": Number(douyinInfo.statistics.digg_count),
           "shareCount": Number(douyinInfo.statistics.share_count),
           "commentCount": Number(douyinInfo.statistics.comment_count),
-          "videoUrl": douyinInfo.url
         }
       }
     })
@@ -345,81 +375,6 @@ const getDouyinDataByUrl = async (path, noteLink) => {
   
 };  
 
-// --002== 请求在replit写的flask框架的接口，获取基本数据
-/* @param:path
-* get_xhs_rough_data-获取基本数据
-* get_xhs_detail_data-获取详细数据
-* generate_barrage_wordcloud-获取弹幕词云
-*/
-const getXHSdatabylink = async (path, noteLink) => {
-  
-  var url = `https://get-xhs-data-by-link-1326906378.replit.app/${path}`
-  // var url = `https://b38518d2-23ba-4ef1-bb13-9d8618f01f35-00-271zcrskr9ata.worf.replit.dev/${path}`
-  let res;
-
-  if (path === 'get_xhs_rough_data') {
-    var data = qs.stringify({
-      'url': noteLink
-    });
-
-    var config = {
-      method: 'post',
-      url: url,
-      data : data
-    };
-
-    await axios(config)
-      .then(function (response) {
-        console.log("getXHSdatabylink() >> response.data || res", response.data);
-        res = response.data
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  } else if (path === 'get_xhs_detail_data') { // 获取详细数据，需要进行接口归一化处理
-    var data = qs.stringify({
-      'url': noteLink,
-      'cookie': cookie.value,
-      'xSCommon': xSCommon.value
-    });
-
-    var config = {
-      method: 'post',
-      url: url,
-      data : data
-    };
-    await axios(config)
-      .then(function (response) {
-        console.log("getXHSdatabylink() >> response.data || res", response.data);
-        let noteInfo = response.data.info.data.items[0].note_card
-        res = {
-          "status": 200,
-          "info": {
-            "title": noteInfo.title,
-            "uploader": noteInfo.user.nickname,
-            "releaseTime": noteInfo.time,
-            "lastUpdateTime": noteInfo.last_update_time,
-            "collectionCount": Number(noteInfo.interact_info.collected_count) ,
-            "likeCount": Number(noteInfo.interact_info.liked_count),
-            "shareCount": Number(noteInfo.interact_info.share_count),
-            "commentCount": Number(noteInfo.interact_info.comment_count) 
-          }
-        }
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  } 
-
-  if (res.status === 200)
-    return res.info
-  else 
-    return {"status": "-100", "result": res}
-    
-  
-};  
-
-
 // --003== 创建 mappedFieldIds 中 value 为 -1 的字段
 const createFields = async () => {
   const selection = await bitable.base.getSelection()
@@ -428,10 +383,11 @@ const createFields = async () => {
   for (let key in mappedFieldIds.value) {
     if (mappedFieldIds.value[key] === -1) {
       switch (key) {
+        case "type":  // 类型
         case "title":  // 视频名称
           mappedFieldIds.value[key] = await table.addField({
             type: FieldType.Text,
-            name: t(`selectGroup.videoInfo.title`),
+            name: t(`selectGroup.videoInfo.${key}`),
           })
           break;
         case "uploader": 
@@ -457,6 +413,19 @@ const createFields = async () => {
         case "shareCount":
           mappedFieldIds.value[key] = await table.addField({
             type: FieldType.Number,
+            name: t(`selectGroup.videoInfo.${key}`),
+          })
+          break;
+        case "videoUrl":
+        case "videoCover":
+        case "musicUrl":
+        case "musicTitle":
+        case "signature":
+        case "userhome":
+        case "videoId":
+        case "images":
+          mappedFieldIds.value[key] = await table.addField({
+            type: FieldType.Text,
             name: t(`selectGroup.videoInfo.${key}`),
           })
           break;
@@ -550,22 +519,12 @@ const handleCheckedFieldsToMapChange = (value) => {
 }
 
 
-const parseCookies = (cookieString) => {
-  const keysToKeep = ['odin_tt', 'passport_csrf_token', 'sessionid_ss', 'ttwid', 'msToken']; // 你需要保留的keys
-
-  const cookies = cookieString.split(';').reduce((acc, cookie) => {
-    const [key, value] = cookie.trim().split('=');
-    if (keysToKeep.includes(key)) {
-      acc[key] = value;
-    }
-    return acc;
-  }, {});
-
+const parseCookies = (ttwidCookie) => {
   return {
         "odin_tt": "0c6d74a8c17b82de1728ba876b9fb5d0c6f125b50637c4dbf864f5db0a46ee5a51115992ea439e3acee8fa95bef469892f03a16e66fa6304cba0e47db28167b4",
         "passport_csrf_token": "passport_csrf_token",
         "sessionid_ss": "sessionid_ss",
-        "ttwid": cookieString,
+        "ttwid": ttwidCookie,
         "msToken": "uhVOdNksGtdWBkExgZ2wgij8Dpv60lQhUzE2P2KD_PHtkBhMUpOSV6O8BzM66ardCWG7NbZF0A7PSXOzfnBybrqhlL3QzOBo_77xcxCR_CVw7pOitf-Oy55WxlE="
   };
 }
@@ -580,27 +539,7 @@ onMounted(async () => {
   const view = await table.getViewById(selection.viewId)
   fieldListSeView.value = await view.getFieldMetaList()
   console.log("onMounted >> 多维表格字段", fieldListSeView.value)
-  console.log("onMounted >> 已选中的b站数据字段", checkedFieldsToMap.value)
-  // 获取字段列表 -- end
-  
-
-  // 初始化可参与计算 “总交互量” 的对象数组，以“Count”结尾的
-  allToCalcInterCount.value = fieldsToMap.value
-    .filter(item => item.label.endsWith('Count'));
-
-  console.log("onMounted >> allToCalcInterCount", allToCalcInterCount.value);
-
-  if (localStorage.getItem('isDetailMode') !== null) {  // string 类型
-    isDetailMode.value = localStorage.getItem('isDetailMode')
-  }
-  if (localStorage.getItem('cookie') !== null) {  // string 类型
-    cookie.value = localStorage.getItem('cookie')
-  }
-  if (localStorage.getItem('xSCommon') !== null) {  // string 类型
-    xSCommon.value = localStorage.getItem('xSCommon')
-  }
-  
-
+  console.log("onMounted >> 已选中的采集数据字段", checkedFieldsToMap.value)
 });
     
 </script>
