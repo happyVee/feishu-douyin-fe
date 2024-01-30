@@ -183,10 +183,10 @@ const writeData = async () => {
   const view = await table.getViewById(viewId);
 
   // ## mode1: 全部记录
-  const RecordList = await view.getVisibleRecordIdList()
+  // const RecordList = await view.getVisibleRecordIdList()
 
   // ## model2: 交互式选择记录 
-  // const RecordList = await bitable.ui.selectRecordIdList(tableId, viewId);
+  const RecordList = await bitable.ui.selectRecordIdList(tableId, viewId);
 
   localStorage.setItem('cookie', cookie.value)   // string 类型
   // localStorage.setItem('xSCommon', xSCommon.value)   // string 类型
@@ -267,6 +267,8 @@ const writeData = async () => {
       } else if (field === 'totalInterCount') { // 总互动量
         const totalInterCount = toCalcInterCount.value.reduce((total, key) => total + totalNoteInfo.basicInfo[key], 0);
         await table.setCellValue(mappedFieldIds.value[field], recordId, totalInterCount)
+      } else {
+        await table.setCellValue(mappedFieldIds.value[field], recordId, [{ type: 'text', text: totalNoteInfo.basicInfo[field] }])
       }
     }
 
@@ -345,7 +347,7 @@ const getDouyinDataByUrl = async (path, noteLink) => {
           "type": douyinInfo.type,
           "title": douyinInfo.desc,
           "uploader": douyinInfo.nickname,
-          "releaseTime": douyinInfo.createTime,
+          "releaseTime": douyinInfo.createTime * 1000,
           "videoUrl": douyinInfo.videoUrl,
           "videoCover": douyinInfo.videoCover,
           "musicUrl": douyinInfo.musicUrl,
@@ -385,15 +387,10 @@ const createFields = async () => {
       switch (key) {
         case "type":  // 类型
         case "title":  // 视频名称
+        case "uploader": // 作者名
           mappedFieldIds.value[key] = await table.addField({
             type: FieldType.Text,
             name: t(`selectGroup.videoInfo.${key}`),
-          })
-          break;
-        case "uploader": 
-          mappedFieldIds.value[key] = await table.addField({
-            type: FieldType.Text,
-            name: t(`selectGroup.videoInfo.uploader`),
           })
           break;
         case "releaseTime":
@@ -540,6 +537,10 @@ onMounted(async () => {
   fieldListSeView.value = await view.getFieldMetaList()
   console.log("onMounted >> 多维表格字段", fieldListSeView.value)
   console.log("onMounted >> 已选中的采集数据字段", checkedFieldsToMap.value)
+
+  if (localStorage.getItem('cookie') !== null) {  // string 类型
+    cookie.value = localStorage.getItem('cookie')
+  }
 });
     
 </script>
